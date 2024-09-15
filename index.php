@@ -29,7 +29,11 @@ $result = $conn->query($query);
 <body class="bg-light">
     <div class="container mt-5">
         <h1 class="text-center mb-4 text-primary">All Blog Posts</h1>
-        <a href="create.php" class="btn btn-primary mb-3">Create New Post</a>
+
+        <!-- Center the Create New Post button -->
+        <div class="d-flex justify-content-center mb-3">
+            <a href="create.php" class="btn btn-primary">Create New Post</a>
+        </div>
         
         <!-- Blog posts displayed in rows -->
         <div class="row">
@@ -44,8 +48,10 @@ $result = $conn->query($query);
                         <h2 class="post-title"><?php echo htmlspecialchars($post['title']); ?></h2>
                         <p class="post-meta">By <?php echo htmlspecialchars($post['name']); ?> (<?php echo htmlspecialchars($post['email']); ?>) on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
                         <p><?php echo htmlspecialchars(substr($post['content'], 0, 100)) . '...'; ?></p>
+
                         <a href="edit.php?id=<?php echo $post['id']; ?>" class="btn btn-warning">Edit</a>
                         <a href="delete.php?id=<?php echo $post['id']; ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        <a href="post.php?id=<?php echo $post['id']; ?>" class="btn btn-info">Open Post</a> <!-- New Open Post Button -->
                     </div>
                 </div>
             <?php endwhile; ?>
