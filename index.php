@@ -52,7 +52,7 @@
                                 <p class="card-text"><?php echo substr($post['content'], 0, 100) . '...'; ?></p>
                                 <a href="edit.php?id=<?php echo $post['id']; ?>" class="btn btn-success btn-sm">Edit</a>
                                 <a href="delete.php?id=<?php echo $post['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
-                                <a href="open_blog.php?id=<?php echo $post['id']; ?>" class="btn btn-warning btn-sm">See Blog</a>
+                                <a href="open_blog.php?id=<?php echo $post['id']; ?>" class="btn btn-warning btn-sm">See Blog>></a>
                             </div>
                             <div class="card-footer text-muted d-flex justify-content-between">
                                 <span class="small"><?php echo htmlspecialchars($post['name']); ?></span>

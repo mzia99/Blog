@@ -65,7 +65,7 @@
                     </div>
                     
                     <div class="mt-4">
-                        <a href="index.php" class="btn btn-secondary">Back to Blogs>></a>
+                        <a href="index.php" class="btn btn-secondary">>>Back to Blogs</a>
                     </div>
                 </div>
             </div>
