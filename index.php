@@ -1,7 +1,13 @@
 <?php
 include 'db.php';
 
-$query = "SELECT * FROM posts ORDER BY created_at DESC";
+// Fetch all posts with user details
+$query = "
+    SELECT posts.*, users.name, users.email 
+    FROM posts 
+    LEFT JOIN users ON posts.user_id = users.id 
+    ORDER BY posts.created_at DESC
+";
 $result = $conn->query($query);
 ?>
 
@@ -13,33 +19,33 @@ $result = $conn->query($query);
     <title>Blog Posts</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .post { border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-bottom: 20px; }
+        .post img { max-width: 100%; height: auto; }
+        .post-title { font-size: 1.5rem; font-weight: bold; }
+        .post-meta { font-size: 0.875rem; color: #6c757d; }
+    </style>
 </head>
 <body class="bg-light">
     <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-primary">All Blog Posts</h1>
-            <a href="create.php" class="btn btn-success">Create New Post</a>
-        </div>
+        <h1 class="text-center mb-4 text-primary">All Blog Posts</h1>
+        <a href="create.php" class="btn btn-primary mb-3">Create New Post</a>
         
-        <hr>
-
-        <!-- Display each post in a card format -->
+        <!-- Blog posts displayed in rows -->
         <div class="row">
             <?php while($post = $result->fetch_assoc()): ?>
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card shadow-sm">
+                <div class="col-md-4">
+                    <div class="post bg-white shadow-sm p-3 mb-4 rounded">
+                        <!-- Display post image if it exists -->
                         <?php if (!empty($post['image'])): ?>
-                            <img src="data:image/jpeg;base64,<?php echo base64_encode($post['image']); ?>" class="card-img-top" alt="Post Image">
-                        <?php else: ?>
-                            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Placeholder Image">
+                            <img src="data:image/jpeg;base64,<?php echo base64_encode($post['image']); ?>" alt="Post Image" class="img-fluid">
                         <?php endif; ?>
                         
-                        <div class="card-body">
-                            <h5 class="card-title"><?php echo $post['title']; ?></h5>
-                            <p class="card-text"><?php echo substr($post['content'], 0, 100) . '...'; ?></p>
-                            <a href="edit.php?id=<?php echo $post['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="delete.php?id=<?php echo $post['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
-                        </div>
+                        <h2 class="post-title"><?php echo htmlspecialchars($post['title']); ?></h2>
+                        <p class="post-meta">By <?php echo htmlspecialchars($post['name']); ?> (<?php echo htmlspecialchars($post['email']); ?>) on <?php echo date('F j, Y', strtotime($post['created_at'])); ?></p>
+                        <p><?php echo htmlspecialchars(substr($post['content'], 0, 100)) . '...'; ?></p>
+                        <a href="edit.php?id=<?php echo $post['id']; ?>" class="btn btn-warning">Edit</a>
+                        <a href="delete.php?id=<?php echo $post['id']; ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                     </div>
                 </div>
             <?php endwhile; ?>

@@ -2,6 +2,11 @@
 include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Fetch user details
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    
+    // Fetch post details
     $title = $_POST['title'];
     $content = $_POST['content'];
     $image = $_FILES['image'];
@@ -10,16 +15,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $maxFileSize = 5 * 1024 * 1024; // 5MB
 
     // Check if all fields are filled and image is uploaded
-    if (!empty($title) && !empty($content) && !empty($image['name'])) {
+    if (!empty($name) && !empty($email) && !empty($title) && !empty($content) && !empty($image['name'])) {
         if ($image['size'] > $maxFileSize) {
             $error = "File size must be less than 5MB.";
         } else {
-            // Read the image file content and escape it for insertion
-            $imageData = file_get_contents($image['tmp_name']);
+            // Check if user already exists by email
+            $checkUserStmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $checkUserStmt->bind_param("s", $email);
+            $checkUserStmt->execute();
+            $checkUserStmt->store_result();
+            
+            if ($checkUserStmt->num_rows == 0) {
+                // User does not exist, insert new user
+                $insertUserStmt = $conn->prepare("INSERT INTO users (name, email) VALUES (?, ?)");
+                $insertUserStmt->bind_param("ss", $name, $email);
+                $insertUserStmt->execute();
+                $userId = $insertUserStmt->insert_id;
+                $insertUserStmt->close();
+            } else {
+                // Fetch existing user's ID
+                $checkUserStmt->bind_result($userId);
+                $checkUserStmt->fetch();
+            }
+            $checkUserStmt->close();
 
-            // Prepare the SQL query
-            $stmt = $conn->prepare("INSERT INTO posts (title, content, image) VALUES (?, ?, ?)");
-            $stmt->bind_param("ssb", $title, $content, $imageData);
+            // Insert the post
+            $imageData = file_get_contents($image['tmp_name']);
+            $stmt = $conn->prepare("INSERT INTO posts (title, content, image, user_id) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("ssbi", $title, $content, $imageData, $userId);
             $stmt->send_long_data(2, $imageData); // For large binary data
             $stmt->execute();
             $stmt->close();
@@ -54,6 +77,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
+            <!-- User Information -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Your Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Your Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <!-- Post Information -->
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" name="title" placeholder="Enter post title" required>

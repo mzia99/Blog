@@ -46,32 +46,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Post</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Edit Post</h1>
-    <?php if (isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
-    
-    <!-- Display the current image -->
-    <?php if (!empty($post['image'])): ?>
-        <img src="data:image/jpeg;base64,<?php echo base64_encode($post['image']); ?>" alt="Post Image" style="max-width: 300px; max-height: 300px;"><br><br>
-    <?php else: ?>
-        <p>No image uploaded.</p>
-    <?php endif; ?>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4 text-primary">Edit Post</h1>
 
-    <form method="POST" enctype="multipart/form-data">
-        <label>Title:</label><br>
-        <input type="text" name="title" value="<?php echo $post['title']; ?>"><br><br>
+        <!-- Display error message if exists -->
+        <?php if (isset($error)): ?>
+            <div class="alert alert-danger" role="alert">
+                <?php echo $error; ?>
+            </div>
+        <?php endif; ?>
 
-        <label>Content:</label><br>
-        <textarea name="content"><?php echo $post['content']; ?></textarea><br><br>
+        <!-- Display the current image -->
+        <div class="mb-4 text-center">
+            <?php if (!empty($post['image'])): ?>
+                <img src="data:image/jpeg;base64,<?php echo base64_encode($post['image']); ?>" alt="Post Image" class="img-fluid" style="max-width: 300px; max-height: 300px;">
+            <?php else: ?>
+                <p>No image uploaded.</p>
+            <?php endif; ?>
+        </div>
 
-        <label>Change Image (optional, max 5MB):</label><br>
-        <input type="file" name="image" accept="image/*"><br><br>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" name="title" value="<?php echo htmlspecialchars($post['title']); ?>" required>
+            </div>
 
-        <button type="submit">Update</button>
-    </form>
+            <div class="mb-3">
+                <label for="content" class="form-label">Content</label>
+                <textarea class="form-control" id="content" name="content" rows="5" required><?php echo htmlspecialchars($post['content']); ?></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Change Image (optional, max 5MB)</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success">Update Post</button>
+                <a href="index.php" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
